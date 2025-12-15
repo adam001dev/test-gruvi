@@ -103,13 +103,11 @@ pnpm run dev
 
 ---
 
-## Option 2: Docker Compose Setup (Backend + Database Only)
-
-**Note:** Docker Compose runs only the backend and PostgreSQL. Frontend should be run locally (see Option 1: Frontend Setup).
+## Option 2: Docker Compose Setup (Backend + Frontend + Database)
 
 ### Quick Start
 
-1. **Create environment file:**
+1. **Create backend environment file (if not exists):**
 
 ```bash
 cp backend/.env.example backend/.env
@@ -121,7 +119,13 @@ cp backend/.env.example backend/.env
 TMDB_ACCESS_TOKEN=your_access_token_here
 ```
 
-3. **Start backend and database:**
+3. **Create frontend environment file (if not exists):**
+
+```bash
+cp frontend/.env.example frontend/.env
+```
+
+4. **Start all services (from repo root):**
 
 ```bash
 docker-compose up
@@ -133,25 +137,14 @@ Or run in detached mode (background):
 docker-compose up -d
 ```
 
-4. **Access the services:**
+5. **Access the services:**
 
 - Backend API: <http://localhost:3000>
 - Swagger Docs: <http://localhost:3000/api-docs>
+- Frontend: <http://localhost:5173>
 - PostgreSQL: localhost:5432
 
-5. **Run frontend locally** (in a separate terminal):
-
-```bash
-cd frontend
-pnpm install
-cp .env.example .env
-# Edit .env: VITE_API_BASE_URL=http://localhost:3000
-pnpm run dev
-```
-
-Frontend will be available at: <http://localhost:5173>
-
-### Docker Compose Commands
+### Docker Compose Commands (from repo root)
 
 **Start services:**
 
@@ -168,14 +161,12 @@ docker-compose up -d
 **Stop services:**
 
 ```bash
-cd backend
 docker-compose down
 ```
 
 **Stop and remove volumes (clean slate):**
 
 ```bash
-cd backend
 docker-compose down -v
 ```
 
@@ -183,11 +174,11 @@ docker-compose down -v
 
 ```bash
 # All services
-cd backend
 docker-compose logs
 
 # Specific service
 docker-compose logs backend
+docker-compose logs frontend
 docker-compose logs postgres
 
 # Follow logs
@@ -197,9 +188,8 @@ docker-compose logs -f backend
 **Rebuild after dependency changes:**
 
 ```bash
-# Rebuild backend
-cd backend
-docker-compose build backend
+# Rebuild images
+docker-compose build
 
 # Rebuild and restart
 docker-compose up --build
@@ -279,7 +269,7 @@ pnpm run dev -- --port 5174
 
 **Port conflicts:**
 
-If ports 3000, 5173, or 5432 are already in use, change them in `backend/docker-compose.yml`:
+If ports 3000, 5173, or 5432 are already in use, change them in `docker-compose.yml`:
 
 ```yaml
 ports:
