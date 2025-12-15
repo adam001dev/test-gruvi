@@ -1,0 +1,273 @@
+---
+openapi: 3.0.1
+info:
+  title: API V1
+  version: v1
+paths:
+  "/api/v1/genres":
+    get:
+      summary: List genres
+      tags:
+      - Genres
+      parameters:
+      - name: media_type
+        in: query
+        required: true
+        description: "Media type: 'movie' or 'tv':\n * `movie` \n * `tv` \n "
+        enum:
+        - movie
+        - tv
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Genres retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    tmdb_id:
+                      type: integer
+                    name:
+                      type: string
+                    media_type:
+                      type: string
+                      enum:
+                      - movie
+                      - tv
+                    created_at:
+                      type: string
+                      format: datetime
+                    updated_at:
+                      type: string
+                      format: datetime
+                  required:
+                  - id
+                  - tmdb_id
+                  - name
+                  - media_type
+        '422':
+          description: Invalid media_type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  "/api/v1/genres/sync":
+    post:
+      summary: Sync genres from TMDb
+      tags:
+      - Genres
+      parameters: []
+      responses:
+        '200':
+          description: Genres synced successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '422':
+          description: Invalid media_type or sync failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                media_type:
+                  type: string
+                  enum:
+                  - movie
+                  - tv
+                  description: 'Media type: ''movie'' or ''tv'''
+              required:
+              - media_type
+  "/api/v1/media_items":
+    get:
+      summary: Search media items
+      tags:
+      - Media Items
+      parameters:
+      - name: start_date
+        in: query
+        required: false
+        description: Start date (YYYY-MM-DD format)
+        schema:
+          type: string
+      - name: end_date
+        in: query
+        required: false
+        description: End date (YYYY-MM-DD format)
+        schema:
+          type: string
+      - name: media_type
+        in: query
+        required: true
+        description: "Media type: 'movie' or 'tv':\n * `movie` \n * `tv` \n "
+        enum:
+        - movie
+        - tv
+        schema:
+          type: string
+      - name: genre_ids
+        in: query
+        required: false
+        description: Comma-separated genre IDs
+        schema:
+          type: string
+      - name: min_rating
+        in: query
+        required: false
+        description: Minimum rating (0-10)
+        schema:
+          type: number
+      - name: sort_by
+        in: query
+        required: false
+        description: Sort parameter (e.g., 'release_date.asc', 'popularity.desc')
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: 'Page number (default: 1)'
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Media items retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        tmdb_id:
+                          type: integer
+                        media_type:
+                          type: string
+                          enum:
+                          - movie
+                          - tv
+                        title:
+                          type: string
+                        release_date:
+                          type: string
+                          format: date
+                        overview:
+                          type: string
+                        poster_path:
+                          type: string
+                          nullable: true
+                        popularity:
+                          type: number
+                        vote_average:
+                          type: number
+                        vote_count:
+                          type: integer
+                        original_language:
+                          type: string
+                        adult:
+                          type: boolean
+                        genres:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                              tmdb_id:
+                                type: integer
+                              name:
+                                type: string
+                              media_type:
+                                type: string
+                      required:
+                      - id
+                      - tmdb_id
+                      - media_type
+                      - title
+                      - release_date
+                  query_key:
+                    type: string
+                  cached:
+                    type: boolean
+                  last_updated:
+                    type: string
+                    format: datetime
+                    nullable: true
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                      total_pages:
+                        type: integer
+                        nullable: true
+                      total_results:
+                        type: integer
+                        nullable: true
+                      per_page:
+                        type: integer
+                required:
+                - data
+                - query_key
+                - cached
+                - pagination
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+servers:
+- url: https://{defaultHost}
+  variables:
+    defaultHost:
+      default: www.example.com

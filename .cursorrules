@@ -1,0 +1,8 @@
+# Cursor rules
+
+- Always run and fix lint before finishing changes.
+  - Frontend: `pnpm lint`
+  - Frontend type safety: `pnpm type-check`
+  - Backend: `bundle exec rubocop -a` (or `./bin/rubocop`)
+- Logging: use `console.debug` only; do not add `console.log`
+- Comments: avoid step-by-step explanations; only add when logic is non-obvious
